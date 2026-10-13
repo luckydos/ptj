@@ -64,6 +64,7 @@ body {
 	gap: 6px;
 }
 
+/* 새로고침 원형 버튼 */
 .btn-refresh {
 	background: #ffffff;
 	border: 1px solid #dcdfe6;
@@ -73,20 +74,50 @@ body {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	font-size: 13px;
 	cursor: pointer;
 	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
-	transition: transform 0.2s ease;
+	color: #4e5968;
+	transition: all 0.2s ease;
+	padding: 0;
+}
+
+.btn-refresh:hover {
+	background: #f8fafc;
+	color: #1a73e8;
+	border-color: #c2d7fa;
 }
 
 .btn-refresh:active {
-	transform: scale(0.9);
+	transform: scale(0.92);
 }
 
+/* 내부 SVG 아이콘 */
+.btn-refresh .refresh-icon {
+	width: 15px;
+	height: 15px;
+	display: block;
+	transition: transform 0.2s ease;
+}
+
+/* 동기화 중: 겉 버튼은 고정되고 내부 원형 화살표만 매끄럽게 회전 */
 .btn-refresh.spinning {
-	animation: swalSpin 0.8s linear infinite;
 	pointer-events: none;
-	opacity: 0.7;
+	border-color: #1a73e8;
+	color: #1a73e8;
+}
+
+.btn-refresh.spinning .refresh-icon {
+	animation: smoothSpin 0.75s linear infinite;
+}
+
+@keyframes smoothSpin {
+	0% {
+		transform: rotate(0deg);
+	}
+
+	100% {
+		transform: rotate(360deg);
+	}
 }
 
 .macro-indicator-badge {
@@ -401,26 +432,33 @@ body {
 	min-width: 0;
 }
 
+/* 티커명과 차트 버튼을 감싸는 컨테이너 수직 중앙 정렬 */
 .ticker-link-wrap {
-	display: flex;
+	display: inline-flex;
 	align-items: center;
 	gap: 6px;
+	line-height: 1;
 }
 
+/* 티커 텍스트 높이 기준선 정렬 */
 .hero-title {
 	font-size: 24px;
 	font-weight: 800;
 	color: #191f28;
 	letter-spacing: -0.5px;
+	line-height: 1.1;
+	display: inline-flex;
+	align-items: center;
 }
 
+/* 차트 버튼 공통 베이스 */
 .btn-finviz-chart {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	min-width: 26px;
-	height: 26px;
-	padding: 0 5px;
+	width: 24px;
+	height: 24px;
+	min-width: 24px;
 	border-radius: 6px;
 	background: #f0f4fa;
 	color: #1a73e8;
@@ -428,12 +466,20 @@ body {
 	font-weight: 800;
 	text-decoration: none;
 	white-space: nowrap;
+	line-height: 1;
+	user-select: none;
+	transform: translateY(-1px);
+	/* 모바일 폰트 베이스라인 시각 보정 */
 }
 
+/* 네이버 배지 전용 정밀 스타일 */
 .btn-finviz-chart.naver-btn {
 	background: #03c75a;
 	color: #ffffff;
 	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+	font-size: 13px;
+	font-weight: 900;
+	letter-spacing: -0.3px;
 }
 
 .btn-finviz-chart:active {
