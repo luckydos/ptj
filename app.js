@@ -149,6 +149,11 @@ function getBadgeClass(decisionStr) {
 	return 'badge-box-wait';
 }
 
+function parseCleanNum(valStr) {
+	if (!valStr || valStr === '-' || valStr === '#N/A') return NaN;
+	return parseFloat(String(valStr).replace(/[^0-9.-]+/g, ''));
+}
+
 function showTip(type) {
 	const data = currentSelectedTicker ? stockDataStore[currentSelectedTicker] : null;
 
@@ -203,6 +208,13 @@ function showTip(type) {
 			title: '시장 추세 (마크로 필터)',
 			text: marketBoxHtml + '<b>S&P 500과 나스닥 종합지수</b>의 200일선 상회 여부를 보여줍니다.<br><br>• <b>원칙</b>: 전체 시장이 하락세(▼)일 때는 개별 종목 매매 확률이 떨어지므로 비중을 조절합니다.'
 		},
+		priceRange: {
+			title: '시세 게이지 바',
+			text: '<b>현재 주가가 변동 밴드 안에서 어느 위치에 있는지를 보여줍니다.</b><br><br>' +
+				'• <b>1일 레인지</b>: 오늘 장중 최저가와 최고가 사이의 현재가 위치<br>' +
+				'• <b>1년 레인지</b>: 최근 52주 최저가와 최고가 사이의 현재가 위치<br>' +
+				'• <b>초록색 핀</b>이 오른쪽 끝에 가까울수록 신고가 돌파 임박/신고가 랠리 영역입니다.'
+		},
 		decision: {
 			title: 'PTJ 전략 판정 기준 (Position & Trail)',
 			text: '<b>[3단계 사이클 핵심 판정 원칙]</b><br><br>' +
@@ -228,7 +240,7 @@ function showTip(type) {
 				'• <b>20MA</b>: 스윙 추세선 (이탈 시 상승 파동 종료)'
 		},
 		exitRule: {
-			title: '기계적 분할 익절 가이드',
+			title: '대응 가이드 (분할 청산 원칙)',
 			text: '<b>신고가 돌파 후 하락 전환 시 기계적으로 대응합니다.</b><br><br>' +
 				'감정에 흔들리지 않고 현재 주가가 5일선 ➔ 10일선 ➔ 20일선을 하향 이탈할 때마다 30%씩 분할 매도하여 수익을 확정합니다.'
 		},
@@ -562,7 +574,6 @@ function selectTicker(ticker, targetElement = null, shouldRender = true) {
 		targetChip.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
 	}
 
-	// 리스트 뷰 항목 선택 하이라이트
 	document.querySelectorAll('.list-card-item').forEach(item => {
 		const tickerSpan = item.querySelector('.list-ticker');
 		if (tickerSpan) {
@@ -606,8 +617,8 @@ function renderCard(ticker) {
 	badge.className = 'badge ' + getBadgeClass(data.decision);
 
 	// 52주 신고가 대비 이격도
-	const numP = parseFloat(String(data.currentPrice || '').replace(/[^0-9.-]+/g, ''));
-	const numATH = parseFloat(String(data.high52 || '').replace(/[^0-9.-]+/g, ''));
+	const numP = parseCleanNum(data.currentPrice);
+	const numATH = parseCleanNum(data.high52);
 	const pill = document.getElementById('resATHPill');
 
 	let athDiffVal = 0;
@@ -616,8 +627,32 @@ function renderCard(ticker) {
 		athDiffVal = ((numP - numATH) / numATH * 100).toFixed(1);
 		isNearATH = athDiffVal >= -2.0;
 	}
-	pill.innerText = isNearATH ? '★ 52W 신고가 돌파' : ('신고가 대비 ' + athDiffVal + '%');
+	pill.innerText = isNearATH ? '★ 52W 신고가 돌파' : `신고가 대비 ${athDiffVal}%`;
 	pill.className = 'trend-pill ' + (isNearATH ? 'trend-up' : 'trend-down');
+
+	// 시세 레인지 게이지 바 렌더링
+	const numDayLow = parseCleanNum(data.dayLow);
+	const numDayHigh = parseCleanNum(data.dayHigh);
+	const numYearLow = parseCleanNum(data.low52);
+
+	document.getElementById('resDayLow').innerText = data.dayLow || '-';
+	document.getElementById('resDayHigh').innerText = data.dayHigh || '-';
+	document.getElementById('resYearLow').innerText = data.low52 || '-';
+	document.getElementById('resYearHigh').innerText = data.high52 || '-';
+
+	// 1일 게이지 핀 위치 (%)
+	let dayPct = 50;
+	if (!isNaN(numP) && !isNaN(numDayLow) && !isNaN(numDayHigh) && numDayHigh > numDayLow) {
+		dayPct = Math.max(0, Math.min(100, ((numP - numDayLow) / (numDayHigh - numDayLow)) * 100));
+	}
+	document.getElementById('dayRangePin').style.left = `${dayPct}%`;
+
+	// 1년 게이지 핀 위치 (%)
+	let yearPct = 50;
+	if (!isNaN(numP) && !isNaN(numYearLow) && !isNaN(numATH) && numATH > numYearLow) {
+		yearPct = Math.max(0, Math.min(100, ((numP - numYearLow) / (numATH - numYearLow)) * 100));
+	}
+	document.getElementById('yearRangePin').style.left = `${yearPct}%`;
 
 	// 통계 1: 52주 최고가
 	document.getElementById('resHigh52').innerText = data.high52 || '-';
@@ -634,40 +669,52 @@ function renderCard(ticker) {
 	document.getElementById('resBoxHigh').innerText = data.boxHigh || '-';
 	document.getElementById('resBoxRangeBadge').innerText = `폭 ${data.boxRange || '-'}`;
 
-	// 통계 3: 5·10·20MA 이평선 수치 및 돌파 여부
-	const numMA5 = parseFloat(String(data.ma5 || '').replace(/[^0-9.-]+/g, ''));
-	const numMA10 = parseFloat(String(data.ma10 || '').replace(/[^0-9.-]+/g, ''));
-	const numMA20 = parseFloat(String(data.ma20 || '').replace(/[^0-9.-]+/g, ''));
+	// 통계 3: 5·10·20MA 이평선 3단 풀 너비 행 렌더링
+	const numMA5 = parseCleanNum(data.ma5);
+	const numMA10 = parseCleanNum(data.ma10);
+	const numMA20 = parseCleanNum(data.ma20);
 
-	const chip5 = document.getElementById('chipMA5');
-	const chip10 = document.getElementById('chipMA10');
-	const chip20 = document.getElementById('chipMA20');
+	document.getElementById('valMA5').innerText = data.ma5 || '-';
+	document.getElementById('valMA10').innerText = data.ma10 || '-';
+	document.getElementById('valMA20').innerText = data.ma20 || '-';
 
-	chip5.innerText = `5: ${data.ma5 || '-'}`;
-	chip10.innerText = `10: ${data.ma10 || '-'}`;
-	chip20.innerText = `20: ${data.ma20 || '-'}`;
+	const applyStripState = (rowId, badgeId, maVal) => {
+		const rowEl = document.getElementById(rowId);
+		const badgeEl = document.getElementById(badgeId);
+		if (isNaN(numP) || isNaN(maVal)) {
+			rowEl.className = 'ma-strip-row';
+			badgeEl.innerText = '-';
+			return;
+		}
+		const isPass = numP >= maVal;
+		rowEl.className = 'ma-strip-row ' + (isPass ? 'pass' : 'broken');
+		badgeEl.innerText = isPass ? '지지 ✓' : '이탈 ✕';
+	};
 
-	if (!isNaN(numP)) {
-		chip5.className = 'ma-chip ' + (!isNaN(numMA5) ? (numP >= numMA5 ? 'pass' : 'broken') : '');
-		chip10.className = 'ma-chip ' + (!isNaN(numMA10) ? (numP >= numMA10 ? 'pass' : 'broken') : '');
-		chip20.className = 'ma-chip ' + (!isNaN(numMA20) ? (numP >= numMA20 ? 'pass' : 'broken') : '');
-	}
+	applyStripState('stripMA5', 'badgeMA5', numMA5);
+	applyStripState('stripMA10', 'badgeMA10', numMA10);
+	applyStripState('stripMA20', 'badgeMA20', numMA20);
 
-	// 통계 4: 다음 익절 경고선 (5·10·20선 순차적 안내)
-	const nextExitEl = document.getElementById('resNextExitLine');
+	// 통계 4: 대응 가이드 (깔끔한 2단 분리 렌더링)
+	const exitMainEl = document.getElementById('resExitMain');
+	const exitSubEl = document.getElementById('resExitSub');
+
 	if (!isNaN(numP) && !isNaN(numMA5) && numP >= numMA5) {
-		nextExitEl.innerText = `5MA (${data.ma5}) 하회 시 30% 매도`;
-		nextExitEl.className = 'stat-val blue';
+		exitMainEl.innerText = `5MA (${data.ma5})`;
+		exitMainEl.className = 'exit-line-main blue';
+		exitSubEl.innerText = '하회 시 30% 1차 분할 매도';
 	} else if (!isNaN(numP) && !isNaN(numMA10) && numP >= numMA10) {
-		nextExitEl.innerText = `10MA (${data.ma10}) 하회 시 30% 매도`;
-		nextExitEl.className = 'stat-val red';
+		exitMainEl.innerText = `10MA (${data.ma10})`;
+		exitMainEl.className = 'exit-line-main red';
+		exitSubEl.innerText = '하회 시 30% 2차 분할 매도';
 	} else if (!isNaN(numP) && !isNaN(numMA20) && numP >= numMA20) {
-		nextExitEl.innerText = `20MA (${data.ma20}) 하회 시 전량 매도`;
-		nextExitEl.className = 'stat-val red';
+		exitMainEl.innerText = `20MA (${data.ma20})`;
+		exitMainEl.className = 'exit-line-main red';
+		exitSubEl.innerText = '하회 시 전량 정리 (추세 종료)';
 	} else {
-		nextExitEl.innerText = '추세 이탈 정리 완료';
-		nextExitEl.className = 'stat-val';
-		nextExitEl.style.color = '#8b95a1';
+		exitMainEl.innerText = '전량 정리 완료';
+		exitMainEl.className = 'exit-line-main muted';
+		exitSubEl.innerText = '관망 / 다음 박스 하단 대기';
 	}
 
 	document.getElementById('resTradeTime').innerText = data.tradeTime || "-";

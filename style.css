@@ -441,8 +441,8 @@ body {
 	display: flex;
 	justify-content: space-between;
 	align-items: flex-start;
-	margin-bottom: 16px;
-	padding-bottom: 16px;
+	margin-bottom: 14px;
+	padding-bottom: 12px;
 	border-bottom: 1px solid #f2f4f6;
 	gap: 8px;
 }
@@ -553,7 +553,6 @@ body {
 	white-space: nowrap;
 }
 
-/* 4단계 상태 배지 */
 .badge-ath {
 	background: #e6f4ea;
 	color: #137333;
@@ -605,6 +604,86 @@ body {
 	color: #c5221f;
 }
 
+/* 시세 섹션 스타일 */
+.price-range-section {
+	background: #f9fafb;
+	border: 1px solid #edf0f2;
+	border-radius: 12px;
+	padding: 10px 12px;
+	margin-bottom: 14px;
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+.range-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding-bottom: 4px;
+	border-bottom: 1px dashed #e5e8eb;
+}
+
+.range-title {
+	font-size: 12px;
+	font-weight: 700;
+	color: #4e5968;
+}
+
+.range-item {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.range-track-wrap {
+	padding: 4px 2px 2px;
+}
+
+.range-track {
+	position: relative;
+	width: 100%;
+	height: 6px;
+	background: #e5e8eb;
+	border-radius: 3px;
+}
+
+.range-pin {
+	position: absolute;
+	top: 50%;
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+	background: #03c75a;
+	box-shadow: 0 0 0 2px #ffffff, 0 1px 3px rgba(0, 0, 0, 0.25);
+	transform: translate(-50%, -50%);
+	transition: left 0.3s ease;
+}
+
+.range-meta-row {
+	display: flex;
+	justify-content: space-between;
+	align-items: baseline;
+	font-size: 11px;
+}
+
+.range-meta-col {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+}
+
+.range-lbl {
+	color: #8b95a1;
+	font-weight: 500;
+}
+
+.range-val {
+	font-weight: 700;
+	color: #191f28;
+}
+
+/* 통계 그리드 공통 */
 .stat-grid {
 	display: grid;
 	grid-template-columns: 1fr 1fr;
@@ -615,11 +694,11 @@ body {
 .stat-box {
 	background: #f9fafb;
 	border-radius: 14px;
-	padding: 12px 14px;
+	padding: 11px 12px;
 	display: flex;
 	flex-direction: column;
 	justify-content: space-between;
-	min-height: 74px;
+	min-height: 82px;
 }
 
 .stat-box.highlight-box {
@@ -648,22 +727,6 @@ body {
 	font-weight: 600;
 }
 
-.circle-badge {
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	width: 15px;
-	height: 15px;
-	border-radius: 50%;
-	font-size: 11px;
-	font-weight: 900;
-}
-
-.circle-badge-minus {
-	background: #fee2e2;
-	color: #dc2626;
-}
-
 .base-tag {
 	font-size: 9.5px;
 	font-weight: 700;
@@ -674,31 +737,118 @@ body {
 	margin-left: 2px;
 }
 
-/* 5·10·20선 인라인 칩 그룹 */
-.ma-levels-row {
+.box-range-val {
+	font-size: 13.5px !important;
+	font-weight: 700;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 	display: flex;
+	align-items: center;
+	gap: 3px;
+}
+
+.range-separator {
+	color: #8b95a1;
+	font-weight: 500;
+	font-size: 12px;
+}
+
+/* 5·10·20선 (MA) 3단 풀 너비 행 스타일 */
+.ma-stat-box,
+.exit-stat-box {
+	min-height: 104px;
+	/* 좌우 하단 박스 높이 일치 */
+}
+
+.ma-strip-container {
+	display: flex;
+	flex-direction: column;
 	gap: 4px;
-	flex-wrap: wrap;
 	margin-top: 2px;
 }
 
-.ma-chip {
-	font-size: 11.5px;
+.ma-strip-row {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 3px 6px;
+	border-radius: 6px;
+	font-size: 11px;
 	font-weight: 700;
-	padding: 2px 6px;
-	border-radius: 5px;
-	background: #edf2f7;
-	color: #4a5568;
+	transition: background 0.15s ease;
 }
 
-.ma-chip.pass {
+.ma-strip-row.pass {
 	background: #e6f4ea;
 	color: #137333;
 }
 
-.ma-chip.broken {
+.ma-strip-row.broken {
 	background: #fee2e2;
 	color: #dc2626;
+}
+
+.ma-strip-lbl {
+	font-size: 10.5px;
+	font-weight: 800;
+	width: 32px;
+}
+
+.ma-strip-price {
+	font-size: 11.5px;
+	font-weight: 700;
+	flex: 1;
+	text-align: center;
+}
+
+.ma-strip-badge {
+	font-size: 10px;
+	font-weight: 800;
+}
+
+/* 대응 가이드 (여백 최적화 및 상단 정렬) */
+.exit-stat-box {
+	justify-content: flex-start !important;
+	/* 위아래 벌어짐 방지 */
+}
+
+.exit-rule-content {
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	gap: 4px;
+	margin-top: 6px;
+	/* 제목과 내용 사이의 깔끔한 간격 */
+}
+
+.exit-line-main {
+	font-size: 15px;
+	font-weight: 800;
+	color: #191f28;
+	letter-spacing: -0.3px;
+	line-height: 1.25;
+}
+
+.exit-line-main.blue {
+	color: #1a73e8;
+}
+
+.exit-line-main.red {
+	color: #dc2626;
+}
+
+.exit-line-main.muted {
+	color: #8b95a1;
+	font-weight: 600;
+	font-size: 14.5px;
+}
+
+.exit-line-sub {
+	font-size: 11.5px;
+	font-weight: 600;
+	color: #6b7684;
+	line-height: 1.25;
 }
 
 .btn-tip {
@@ -720,18 +870,6 @@ body {
 	align-items: baseline;
 	gap: 4px;
 	flex-wrap: wrap;
-}
-
-.stat-val.blue {
-	color: #1a73e8;
-}
-
-.stat-val.green {
-	color: #137333;
-}
-
-.stat-val.red {
-	color: #e52528;
 }
 
 .drawdown-sub {
