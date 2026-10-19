@@ -40,7 +40,7 @@
 			</div>
 		</div>
 
-		<!-- 시장 추세 카드 -->
+		<!-- 시장 추세 카드 (모바일 상하 2행 / PC 좌우 2열) -->
 		<div class="market-card">
 			<div class="market-header-row">
 				<div class="market-title-wrap">
@@ -130,7 +130,7 @@
 							</div>
 						</div>
 
-						<!-- 시세 게이지 섹션 (간결화된 '시세' 타이틀) -->
+						<!-- 시세 게이지 섹션 -->
 						<div class="price-range-section">
 							<div class="range-header">
 								<span class="range-title">시세</span>
@@ -178,10 +178,10 @@
 
 						<!-- 신규 전략 4분할 통계 그리드 -->
 						<div class="stat-grid">
-							<!-- 1. 52주 최고가 / 이격도 -->
+							<!-- 1. 52주 최고가 (52W High) -->
 							<div class="stat-box highlight-box">
 								<div class="stat-label-row">
-									<span class="stat-label">52주 신고가 (ATH)</span>
+									<span class="stat-label">52주 최고가 (52W High)</span>
 									<button type="button" class="btn-tip" onclick="showTip('ath')">ℹ️</button>
 								</div>
 								<div class="stat-val">
@@ -231,7 +231,7 @@
 								</div>
 							</div>
 
-							<!-- 4. 대응 가이드 (마이너스 아이콘 삭제 및 깔끔한 상단 정렬) -->
+							<!-- 4. 대응 가이드 -->
 							<div class="stat-box exit-stat-box" id="boxExitTrigger">
 								<div class="stat-label-row">
 									<div class="stat-label-left">
@@ -280,7 +280,8 @@
 		</div>
 	</div>
 
-	<script src="./app.js"></script>
+	<!-- 버전 쿼리스트링으로 모바일 브라우저 캐시 방어 -->
+	<script src="./app.js?v=2.2"></script>
 </body>
 
 </html>

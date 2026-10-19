@@ -239,7 +239,8 @@ body {
 	color: #8b95a1;
 }
 
-/* 시장 추세 카드 내부: 좌/우 2열 -> 위/아래 2행(Row) 시원한 리스트 구조로 개편 */
+/* ★ 시장 추세 반응형 레이아웃 분기 */
+/* 1. 기본 (모바일): 상하 2행 시원한 리스트 구조 */
 .market-items-grid {
 	display: flex;
 	flex-direction: column;
@@ -258,24 +259,17 @@ body {
 	transition: all 0.15s ease;
 }
 
-.market-item-link:hover {
-	background: #f1f5f9;
-	border-color: #cbd5e1;
-}
-
 .market-name {
 	font-size: 13px;
 	font-weight: 700;
 	color: #334155;
 	white-space: nowrap;
-	min-width: 70px;
 }
 
 .market-val-group {
 	display: flex;
 	align-items: center;
 	gap: 10px;
-	/* 지수 가격과 뱃지 사이 여유 있는 간격 확보 */
 }
 
 .market-val {
@@ -301,6 +295,23 @@ body {
 .market-down {
 	background: #fce8e6;
 	color: #c5221f;
+}
+
+/* 2. PC 및 태블릿 (768px 이상): 좌우 2열 그리드로 복원 */
+@media (min-width: 768px) {
+	.market-items-grid {
+		display: grid !important;
+		grid-template-columns: 1fr 1fr !important;
+		gap: 8px !important;
+	}
+
+	.market-item-link {
+		padding: 7px 10px;
+	}
+
+	.market-val-group {
+		gap: 6px;
+	}
 }
 
 .view-mode-controller {
@@ -612,7 +623,7 @@ body {
 	color: #c5221f;
 }
 
-/* 시세 섹션 스타일 */
+/* 시세 게이지 섹션 */
 .price-range-section {
 	background: #f9fafb;
 	border: 1px solid #edf0f2;
@@ -766,7 +777,6 @@ body {
 .ma-stat-box,
 .exit-stat-box {
 	min-height: 104px;
-	/* 좌우 하단 박스 높이 일치 */
 }
 
 .ma-strip-container {
@@ -818,7 +828,6 @@ body {
 /* 대응 가이드 (여백 최적화 및 상단 정렬) */
 .exit-stat-box {
 	justify-content: flex-start !important;
-	/* 위아래 벌어짐 방지 */
 }
 
 .exit-rule-content {
@@ -827,7 +836,6 @@ body {
 	justify-content: flex-start;
 	gap: 4px;
 	margin-top: 6px;
-	/* 제목과 내용 사이의 깔끔한 간격 */
 }
 
 .exit-line-main {
