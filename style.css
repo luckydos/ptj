@@ -15,6 +15,35 @@ body {
 .container {
 	max-width: 440px;
 	margin: 0 auto;
+	transition: max-width 0.25s ease;
+}
+
+/* PC 및 태블릿(768px 이상) 반응형 스플릿 레이아웃 */
+@media (min-width: 768px) {
+	.container {
+		max-width: 980px;
+		padding: 18px 8px;
+	}
+
+	.mobile-only {
+		display: none !important;
+	}
+
+	.main-content-layout {
+		display: grid !important;
+		grid-template-columns: 1fr 1.08fr;
+		gap: 16px;
+		align-items: flex-start;
+	}
+
+	.content-pane {
+		display: block !important;
+	}
+
+	.card-pane {
+		position: sticky;
+		top: 14px;
+	}
 }
 
 .macro-header-container {
@@ -91,7 +120,6 @@ body {
 	transform: scale(0.92);
 }
 
-/* 내부 SVG 아이콘 */
 .btn-refresh .refresh-icon {
 	width: 15px;
 	height: 15px;
@@ -99,7 +127,6 @@ body {
 	transition: transform 0.2s ease;
 }
 
-/* 동기화 중: 겉 버튼은 고정되고 내부 원형 화살표만 매끄럽게 회전 */
 .btn-refresh.spinning {
 	pointer-events: none;
 	border-color: #1a73e8;
@@ -123,6 +150,8 @@ body {
 .macro-indicator-badge {
 	display: inline-flex;
 	align-items: center;
+	justify-content: center;
+	min-width: 122px;
 	gap: 5px;
 	padding: 6px 11px;
 	border-radius: 20px;
@@ -432,7 +461,6 @@ body {
 	min-width: 0;
 }
 
-/* 티커명과 차트 버튼을 감싸는 컨테이너 수직 중앙 정렬 */
 .ticker-link-wrap {
 	display: inline-flex;
 	align-items: center;
@@ -440,7 +468,6 @@ body {
 	line-height: 1;
 }
 
-/* 티커 텍스트 높이 기준선 정렬 */
 .hero-title {
 	font-size: 24px;
 	font-weight: 800;
@@ -451,7 +478,6 @@ body {
 	align-items: center;
 }
 
-/* 차트 버튼 공통 베이스 */
 .btn-finviz-chart {
 	display: inline-flex;
 	align-items: center;
@@ -469,10 +495,8 @@ body {
 	line-height: 1;
 	user-select: none;
 	transform: translateY(-1px);
-	/* 모바일 폰트 베이스라인 시각 보정 */
 }
 
-/* 네이버 배지 전용 정밀 스타일 */
 .btn-finviz-chart.naver-btn {
 	background: #03c75a;
 	color: #ffffff;
@@ -529,17 +553,33 @@ body {
 	white-space: nowrap;
 }
 
-.badge-buy {
+/* 4단계 상태 배지 */
+.badge-ath {
 	background: #e6f4ea;
 	color: #137333;
 }
 
-.badge-wait {
+.badge-box-buy {
+	background: #e8f0fe;
+	color: #1a73e8;
+}
+
+.badge-box-wait {
+	background: #f2f4f6;
+	color: #6b7684;
+}
+
+.badge-exit-1 {
 	background: #fef7e0;
 	color: #b06000;
 }
 
-.badge-fail {
+.badge-exit-2 {
+	background: #ffedd5;
+	color: #c2410c;
+}
+
+.badge-exit-3 {
 	background: #fce8e6;
 	color: #c5221f;
 }
@@ -587,16 +627,6 @@ body {
 	border: 1px solid #d2e3fc;
 }
 
-.stat-box.clickable-box {
-	cursor: pointer;
-	transition: background 0.15s ease;
-	user-select: none;
-}
-
-.stat-box.clickable-box:active {
-	background: #f1f3f5;
-}
-
 .stat-label-row {
 	display: flex;
 	justify-content: space-between;
@@ -629,39 +659,46 @@ body {
 	font-weight: 900;
 }
 
-.circle-badge-plus {
-	background: #e8f0fe;
-	color: #1a73e8;
-}
-
 .circle-badge-minus {
 	background: #fee2e2;
 	color: #dc2626;
 }
 
 .base-tag {
-	font-size: 9px;
-	font-weight: 700;
-	padding: 1px 4px;
-	border-radius: 4px;
-	background: #fee2e2;
-	color: #b91c1c;
-	margin-left: 2px;
-}
-
-.target-stage-badge {
 	font-size: 9.5px;
 	font-weight: 700;
-	color: #1a73e8;
-	background: #e8f0fe;
 	padding: 2px 5px;
 	border-radius: 4px;
+	background: #e8f0fe;
+	color: #1a73e8;
 	margin-left: 2px;
 }
 
-.target-stage-badge.stage-2 {
-	color: #137333;
+/* 5·10·20선 인라인 칩 그룹 */
+.ma-levels-row {
+	display: flex;
+	gap: 4px;
+	flex-wrap: wrap;
+	margin-top: 2px;
+}
+
+.ma-chip {
+	font-size: 11.5px;
+	font-weight: 700;
+	padding: 2px 6px;
+	border-radius: 5px;
+	background: #edf2f7;
+	color: #4a5568;
+}
+
+.ma-chip.pass {
 	background: #e6f4ea;
+	color: #137333;
+}
+
+.ma-chip.broken {
+	background: #fee2e2;
+	color: #dc2626;
 }
 
 .btn-tip {
@@ -695,12 +732,6 @@ body {
 
 .stat-val.red {
 	color: #e52528;
-}
-
-.stat-val.muted {
-	color: #adb5bd;
-	font-size: 14px;
-	font-weight: 500;
 }
 
 .drawdown-sub {
@@ -766,6 +797,17 @@ body {
 	display: flex;
 	flex-direction: column;
 	gap: 6px;
+	transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.list-card-item:hover {
+	border-color: #b9d5fc;
+	box-shadow: 0 2px 8px rgba(26, 115, 232, 0.08);
+}
+
+.list-card-item.selected {
+	border-color: #1a73e8;
+	background: #f8fbff;
 }
 
 .list-card-row-top {
@@ -796,9 +838,9 @@ body {
 
 .list-card-row-bottom {
 	display: grid !important;
-	grid-template-columns: minmax(0, 1fr) 36px 64px 64px !important;
+	grid-template-columns: minmax(0, 1fr) auto auto !important;
 	align-items: center;
-	gap: 4px;
+	gap: 6px;
 	font-size: 11.5px;
 	color: #8b95a1;
 	width: 100%;
@@ -813,37 +855,9 @@ body {
 	display: block;
 }
 
-.list-ma-label {
-	width: 36px !important;
-	min-width: 36px !important;
-	text-align: left !important;
-}
-
-.list-ma-val {
-	width: 64px !important;
-	min-width: 64px !important;
-	text-align: right !important;
+.list-ath-diff {
 	font-weight: 700;
-}
-
-.list-ma-val.up {
-	color: #137333;
-}
-
-.list-ma-val.down {
-	color: #c5221f;
-}
-
-.list-rr-tag {
-	display: inline-block;
-	width: 64px !important;
-	min-width: 64px !important;
-	text-align: center;
-	font-weight: 700;
-	color: #1a73e8;
-	background: #e8f0fe;
-	padding: 2px 0;
-	border-radius: 4px;
+	color: #4e5968;
 }
 
 .status-msg {

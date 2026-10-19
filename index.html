@@ -4,16 +4,13 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-	<title>PTJ 200일선 전략 스캐너</title>
-	
-	<!-- PWA 매니페스트 및 안드로이드 테마 색상 설정 (추가) -->
+	<title>PTJ Scanner</title>
+
 	<link rel="manifest" href="./manifest.json">
 	<meta name="theme-color" content="#1a73e8">
 	<meta name="mobile-web-app-capable" content="yes">
 
-	<!-- 브라우저 탭 파비콘 -->
 	<link rel="icon" type="image/png" href="./images/icon-192.png">
-
 	<link rel="stylesheet" href="./style.css">
 </head>
 
@@ -24,9 +21,9 @@
 			<div class="header-brand-wrap">
 				<div class="header-main-title">
 					<span class="brand-accent">PTJ</span>
-					<span class="brand-title">200MA Scanner</span>
+					<span class="brand-title">Scanner</span>
 				</div>
-				<div class="header-sub-caption">Quantitative Trend Strategy System</div>
+				<div class="header-sub-caption">Position & Trail Judge System</div>
 			</div>
 			<div class="header-right-actions">
 				<div id="macroStatusBadge" class="macro-indicator-badge macro-bull" onclick="showTip('market')">
@@ -72,8 +69,8 @@
 			</div>
 		</div>
 
-		<!-- 뷰 모드 스위처 -->
-		<div class="view-mode-controller">
+		<!-- 모바일 뷰 모드 스위처 (모바일 전용) -->
+		<div class="view-mode-controller mobile-only">
 			<div class="seg-btn-group">
 				<button type="button" id="btnViewList" class="seg-btn active" onclick="switchViewMode('list')">☰ 리스트
 					뷰</button>
@@ -82,8 +79,8 @@
 			</div>
 		</div>
 
-		<!-- 종목 칩 리스트 (카드 뷰 전용) -->
-		<div class="chip-wrapper" id="chipWrapper" style="display:none;">
+		<!-- 종목 칩 리스트 (모바일 카드 뷰 전용) -->
+		<div class="chip-wrapper mobile-only" id="chipWrapper" style="display:none;">
 			<div class="chip-container" id="chipContainer">
 				<div id="chipList" style="display: flex; gap: 6px;"></div>
 				<button type="button" id="btnAddChip" class="btn-add-chip">+ 새 종목</button>
@@ -93,99 +90,109 @@
 		<!-- 상태 메시지 -->
 		<div id="statusMsg" class="status-msg">데이터 동기화 중...</div>
 
-		<!-- 리스트 뷰 영역 -->
-		<div id="listViewArea" style="display:none;">
-			<div class="list-view-container" id="stockListContainer"></div>
-			<div style="text-align: center; margin-top: 14px;">
-				<button type="button" class="btn-add-chip" onclick="openAddStockDialog('')"
-					style="display:inline-block; padding: 9px 20px; font-size: 13.5px;">+ 새 종목 등록하기</button>
+		<!-- 메인 컨텐츠 영역 (PC에서는 좌/우 스플릿 2단 배치) -->
+		<div class="main-content-layout">
+			<!-- 1. 리스트 뷰 영역 -->
+			<div id="listViewArea" class="content-pane list-pane" style="display:none;">
+				<div class="list-view-container" id="stockListContainer"></div>
+				<div style="text-align: center; margin-top: 14px;">
+					<button type="button" class="btn-add-chip" onclick="openAddStockDialog('')"
+						style="display:inline-block; padding: 9px 20px; font-size: 13.5px;">+ 새 종목 등록하기</button>
+				</div>
 			</div>
-		</div>
 
-		<!-- 카드 뷰 영역 -->
-		<div id="cardViewArea" style="display:none;">
-			<div class="card-wrapper">
-				<div class="card" id="stockCard">
-					<div class="hero-header">
-						<div class="hero-left">
-							<div class="hero-title-row">
-								<div class="ticker-link-wrap">
-									<span class="hero-title" id="resTicker"></span>
-									<a id="linkFinviz" href="#" target="_blank" rel="noopener noreferrer"
-										class="btn-finviz-chart">📈</a>
+			<!-- 2. 카드 뷰 영역 -->
+			<div id="cardViewArea" class="content-pane card-pane" style="display:none;">
+				<div class="card-wrapper">
+					<div class="card" id="stockCard">
+						<div class="hero-header">
+							<div class="hero-left">
+								<div class="hero-title-row">
+									<div class="ticker-link-wrap">
+										<span class="hero-title" id="resTicker"></span>
+										<a id="linkFinviz" href="#" target="_blank" rel="noopener noreferrer"
+											class="btn-finviz-chart">📈</a>
+									</div>
+									<span class="hero-corp-name" id="resCorpName" onclick="showTip('corpName')"></span>
 								</div>
-								<span class="hero-corp-name" id="resCorpName" onclick="showTip('corpName')"></span>
+								<div class="hero-price" id="resPrice"></div>
 							</div>
-							<div class="hero-price" id="resPrice"></div>
-						</div>
-						<div class="hero-right">
-							<div class="header-badge-row">
-								<div id="decisionBadge" class="badge" onclick="showTip('decision')"></div>
-								<button type="button" class="btn-tip" onclick="showTip('decision')">ℹ️</button>
-							</div>
-							<div class="header-badge-row">
-								<div id="resMAPill" class="trend-pill" onclick="showTip('ma200')"></div>
-								<button type="button" class="btn-tip" onclick="showTip('ma200')">ℹ️</button>
-							</div>
-						</div>
-					</div>
-
-					<div class="stat-grid">
-						<div class="stat-box highlight-box">
-							<div class="stat-label-row">
-								<span class="stat-label">손익비 (R:R)</span>
-								<button type="button" class="btn-tip" onclick="showTip('rr')">ℹ️</button>
-							</div>
-							<span class="stat-val blue" id="resRR"></span>
-						</div>
-
-						<div class="stat-box">
-							<div class="stat-label-row">
-								<span class="stat-label">최근 고점</span>
-								<button type="button" class="btn-tip" onclick="showTip('high')">ℹ️</button>
-							</div>
-							<div class="stat-val">
-								<span id="resHigh"></span>
-								<span class="drawdown-sub" id="resDrawdown"></span>
-							</div>
-						</div>
-
-						<!-- 매도가 박스 (클릭 시 1차 목표가 <-> 2차 20MA 전환) -->
-						<div class="stat-box clickable-box" id="boxTarget" onclick="toggleTargetStage()"
-							title="클릭하여 1차 목표가 / 2차 20일선 전환">
-							<div class="stat-label-row">
-								<div class="stat-label-left">
-									<span class="circle-badge circle-badge-plus">+</span>
-									<span class="stat-label">매도가</span>
-									<span id="targetStageBadge" class="target-stage-badge">1차:50%</span>
+							<div class="hero-right">
+								<div class="header-badge-row">
+									<div id="decisionBadge" class="badge" onclick="showTip('decision')"></div>
+									<button type="button" class="btn-tip" onclick="showTip('decision')">ℹ️</button>
 								</div>
-								<button type="button" class="btn-tip"
-									onclick="event.stopPropagation(); showTip('target')">ℹ️</button>
-							</div>
-							<span class="stat-val blue" id="resTarget"></span>
-						</div>
-
-						<div class="stat-box" id="boxStop">
-							<div class="stat-label-row">
-								<div class="stat-label-left">
-									<span class="circle-badge circle-badge-minus">−</span>
-									<span class="stat-label">손절가</span>
-									<span class="base-tag" id="resStopBase" style="display:none;">-</span>
+								<div class="header-badge-row">
+									<div id="resATHPill" class="trend-pill" onclick="showTip('ath')"></div>
+									<button type="button" class="btn-tip" onclick="showTip('ath')">ℹ️</button>
 								</div>
-								<button type="button" class="btn-tip" onclick="showTip('stop')">ℹ️</button>
 							</div>
-							<span class="stat-val red" id="resStop"></span>
 						</div>
-					</div>
 
-					<div class="card-footer">
-						<div class="footer-left">
-							<span class="tradetime-val" id="resTradeTime">-</span>
-							<button type="button" class="btn-tip" onclick="showTip('tradetime')">ℹ️</button>
+						<!-- 신규 전략 4분할 통계 그리드 -->
+						<div class="stat-grid">
+							<!-- 1. 52주 최고가 / 이격도 -->
+							<div class="stat-box highlight-box">
+								<div class="stat-label-row">
+									<span class="stat-label">52주 신고가 (ATH)</span>
+									<button type="button" class="btn-tip" onclick="showTip('ath')">ℹ️</button>
+								</div>
+								<div class="stat-val">
+									<span id="resHigh52">-</span>
+									<span class="drawdown-sub" id="resDrawdownATH"></span>
+								</div>
+							</div>
+
+							<!-- 2. 30일 박스권 범위 (상단~하단) -->
+							<div class="stat-box">
+								<div class="stat-label-row">
+									<div class="stat-label-left">
+										<span class="stat-label">30일 박스권</span>
+										<span id="resBoxRangeBadge" class="base-tag">-</span>
+									</div>
+									<button type="button" class="btn-tip" onclick="showTip('box')">ℹ️</button>
+								</div>
+								<div class="stat-val" style="font-size: 13.5px; font-weight: 700;">
+									<span id="resBoxLow" style="color: #1a73e8;">-</span> ~ <span id="resBoxHigh"
+										style="color: #4e5968;">-</span>
+								</div>
+							</div>
+
+							<!-- 3. 이평선 추적 현황 (5MA / 10MA / 20MA) -->
+							<div class="stat-box">
+								<div class="stat-label-row">
+									<span class="stat-label">5·10·20선 (MA)</span>
+									<button type="button" class="btn-tip" onclick="showTip('maLevels')">ℹ️</button>
+								</div>
+								<div class="ma-levels-row">
+									<span class="ma-chip" id="chipMA5">5: -</span>
+									<span class="ma-chip" id="chipMA10">10: -</span>
+									<span class="ma-chip" id="chipMA20">20: -</span>
+								</div>
+							</div>
+
+							<!-- 4. 기계적 청산 기준선 (현재 이탈 단계에 맞춤 안내) -->
+							<div class="stat-box" id="boxExitTrigger">
+								<div class="stat-label-row">
+									<div class="stat-label-left">
+										<span class="circle-badge circle-badge-minus">−</span>
+										<span class="stat-label">다음 익절 경고선</span>
+									</div>
+									<button type="button" class="btn-tip" onclick="showTip('exitRule')">ℹ️</button>
+								</div>
+								<span class="stat-val red" id="resNextExitLine">-</span>
+							</div>
 						</div>
-						<div class="footer-right">
-							<button type="button" id="btnEditStock" class="btn-footer btn-edit">✏️ 수정</button>
-							<button type="button" id="btnDeleteStock" class="btn-footer btn-delete">🗑️ 삭제</button>
+
+						<div class="card-footer">
+							<div class="footer-left">
+								<span class="tradetime-val" id="resTradeTime">-</span>
+								<button type="button" class="btn-tip" onclick="showTip('tradetime')">ℹ️</button>
+							</div>
+							<div class="footer-right">
+								<button type="button" id="btnEditStock" class="btn-footer btn-edit">✏️ 수정</button>
+								<button type="button" id="btnDeleteStock" class="btn-footer btn-delete">🗑️ 삭제</button>
+							</div>
 						</div>
 					</div>
 				</div>
