@@ -3,7 +3,7 @@
 	"short_name": "PTJ스캐너",
 	"description": "박스권 포지션 선점 및 5·10·20 이평선 추적 판정 시스템",
 	"start_url": "./index.html",
-	"display": "standalone",
+	"display": "minimal-ui",
 	"background_color": "#f0f2f5",
 	"icons": [
 		{
