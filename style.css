@@ -10,6 +10,10 @@ body {
 	background: #f0f2f5;
 	padding: 12px;
 	color: #191f28;
+	
+	/* 기기 하단 내비게이션 바 높이만큼 바닥 여백을 자동으로 확보 */
+	padding-bottom: env(safe-area-inset-bottom, 20px);
+	box-sizing: border-box;
 }
 
 .container {
