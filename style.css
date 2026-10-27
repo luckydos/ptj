@@ -1158,3 +1158,69 @@ body {
 		transform: rotate(360deg);
 	}
 }
+
+/* 로그인 화면 스타일 */
+.login-container {
+	min-height: 80vh;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 20px 12px;
+}
+
+.login-card {
+	background: #ffffff;
+	border-radius: 20px;
+	padding: 30px 24px;
+	width: 100%;
+	max-width: 360px;
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+	border: 1px solid #e5e8eb;
+	text-align: center;
+}
+
+.login-sub-text {
+	font-size: 13px;
+	color: #8b95a1;
+	margin-bottom: 24px;
+}
+
+.login-input-group {
+	margin-bottom: 12px;
+}
+
+.login-input {
+	width: 100%;
+	padding: 13px 16px;
+	border: 1.5px solid #e5e8eb;
+	border-radius: 12px;
+	font-size: 14.5px;
+	outline: none;
+	transition: all 0.2s ease;
+	background: #f9fafb;
+}
+
+.login-input:focus {
+	border-color: #1a73e8;
+	background: #ffffff;
+	box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.12);
+}
+
+.btn-login-submit {
+	width: 100%;
+	padding: 13px;
+	background: #1a73e8;
+	color: #ffffff;
+	border: none;
+	border-radius: 12px;
+	font-size: 15px;
+	font-weight: 700;
+	cursor: pointer;
+	margin-top: 8px;
+	transition: background 0.2s ease;
+}
+
+.btn-login-submit:active {
+	background: #1557b0;
+	transform: scale(0.98);
+}

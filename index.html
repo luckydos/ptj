@@ -15,7 +15,30 @@
 </head>
 
 <body>
-	<div class="container">
+	<!-- 1. 로그인 전용 화면 -->
+	<div id="loginContainer" class="login-container" style="display:none;">
+		<div class="login-card">
+			<div class="header-main-title" style="justify-content: center; margin-bottom: 6px;">
+				<span class="brand-accent">PTJ</span>
+				<span class="brand-title">Scanner</span>
+			</div>
+			<p class="login-sub-text">시스템 접근을 위해 로그인해 주세요.</p>
+
+			<form id="loginForm" onsubmit="handleLoginSubmit(event)">
+				<div class="login-input-group">
+					<input type="text" id="loginId" class="login-input" placeholder="아이디" autocomplete="username" required>
+				</div>
+				<div class="login-input-group">
+					<input type="password" id="loginPw" class="login-input" placeholder="비밀번호"
+						autocomplete="current-password" required>
+				</div>
+				<button type="submit" id="btnLoginSubmit" class="btn-login-submit">로그인</button>
+			</form>
+		</div>
+	</div>
+
+	<!-- 2. 메인 스캐너 앱 화면 (기존 container에 id="appContainer" 추가) -->
+	<div class="container" id="appContainer" style="display:none;">
 		<!-- 상단 헤더 영역 -->
 		<div class="macro-header-container">
 			<div class="header-brand-wrap">
@@ -35,6 +58,15 @@
 					<svg class="refresh-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3"
 						stroke-linecap="round" stroke-linejoin="round">
 						<path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-1.19" />
+					</svg>
+				</button>
+				<!-- 로그아웃 버튼 추가 -->
+				<button type="button" id="btnLogout" class="btn-refresh" title="로그아웃" onclick="handleLogout()">
+					<svg class="refresh-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+						stroke-linecap="round" stroke-linejoin="round">
+						<path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+						<polyline points="16 17 21 12 16 7"></polyline>
+						<line x1="21" y1="12" x2="9" y2="12"></line>
 					</svg>
 				</button>
 			</div>

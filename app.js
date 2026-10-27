@@ -4,11 +4,13 @@
 
 const GAS_WEB_APP_URL = "https://script.google.com/macros/s/AKfycbwr_ISMhOrRanQOZwEyX-Ee985ZwxMxCG9JONLc2kr1si68R48QER9Ra_xa48fgzg9T/exec";
 
+// app.js 상단 callBackendApi 수정
 async function callBackendApi(action, payload = {}) {
 	if (typeof google !== 'undefined' && google.script && google.script.run) {
 		return new Promise((resolve, reject) => {
 			const runner = google.script.run.withSuccessHandler(resolve).withFailureHandler(reject);
-			if (action === 'getAll') runner.getAllStockData();
+			if (action === 'login') runner.verifyLogin(payload.id, payload.password);
+			else if (action === 'getAll') runner.getAllStockData();
 			else if (action === 'add') runner.addNewStock(payload.ticker);
 			else if (action === 'update') runner.updateTicker(payload.oldTicker, payload.newTicker);
 			else if (action === 'delete') runner.deleteStock(payload.ticker);
@@ -32,6 +34,85 @@ async function callBackendApi(action, payload = {}) {
 	}
 
 	return await response.json();
+}
+
+// === [신규 추가] 로그인 / 인증 제어 로직 ===
+const SESSION_KEY = "PTJ_SESSION_AUTH";
+
+function checkAuthSession() {
+	const sessionStr = localStorage.getItem(SESSION_KEY);
+	if (!sessionStr) return false;
+
+	try {
+		const session = JSON.parse(sessionStr);
+		const now = new Date().getTime();
+		if (session.token && session.expiresAt && now < session.expiresAt) {
+			return true;
+		}
+	} catch (e) {
+		localStorage.removeItem(SESSION_KEY);
+	}
+	return false;
+}
+
+function showLoginView() {
+	const loginEl = document.getElementById('loginContainer');
+	const appEl = document.getElementById('appContainer');
+	if (loginEl) loginEl.style.display = 'flex';
+	if (appEl) appEl.style.display = 'none';
+}
+
+function showMainAppView() {
+	const loginEl = document.getElementById('loginContainer');
+	const appEl = document.getElementById('appContainer');
+	if (loginEl) loginEl.style.display = 'none';
+	if (appEl) appEl.style.display = 'block';
+	fetchStockData();
+}
+
+async function handleLoginSubmit(e) {
+	e.preventDefault();
+	const idEl = document.getElementById('loginId');
+	const pwEl = document.getElementById('loginPw');
+	const submitBtn = document.getElementById('btnLoginSubmit');
+
+	const id = idEl.value.trim();
+	const password = pwEl.value.trim();
+
+	if (!id || !password) {
+		AppAlert.warning('알림', '아이디와 비밀번호를 모두 입력해 주세요.');
+		return;
+	}
+
+	submitBtn.disabled = true;
+	submitBtn.innerText = '인증 중...';
+
+	try {
+		const res = await callBackendApi('login', { id, password });
+		if (res && res.success) {
+			localStorage.setItem(SESSION_KEY, JSON.stringify({
+				token: res.token,
+				expiresAt: res.expiresAt
+			}));
+			idEl.value = '';
+			pwEl.value = '';
+			showMainAppView();
+		} else {
+			AppAlert.error('로그인 실패', res ? res.error : '계정 정보가 올바르지 않습니다.');
+		}
+	} catch (err) {
+		AppAlert.error('오류 발생', '통신 중 오류가 발생했습니다: ' + err.message);
+	} finally {
+		submitBtn.disabled = false;
+		submitBtn.innerText = '로그인';
+	}
+}
+
+function handleLogout() {
+	AppAlert.confirm('로그아웃', '정말로 로그아웃하시겠습니까?', () => {
+		localStorage.removeItem(SESSION_KEY);
+		showLoginView();
+	});
 }
 
 const AppAlert = {
@@ -355,9 +436,16 @@ window.addEventListener('resize', () => {
 	switchViewMode(currentViewMode);
 });
 
+// window.addEventListener('DOMContentLoaded', ...) 초기화 진입점 수정
 window.addEventListener('DOMContentLoaded', () => {
 	AppAlert.init();
-	fetchStockData();
+
+	// 인증 상태 검사 후 분기 실행
+	if (checkAuthSession()) {
+		showMainAppView();
+	} else {
+		showLoginView();
+	}
 
 	const container = document.getElementById('chipContainer');
 	const wrapper = document.getElementById('chipWrapper');
